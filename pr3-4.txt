@@ -1,0 +1,106 @@
+https://cloud.google.com/application/web3/faucet/ethereum/sepolia
+https://eth-converter.com/extended-converter
+https://etherscan.io/txs
+https://andersbrownworth.com/blockchain/blockchain
+********************************************************************
+pr 3
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract SimpleStorage {
+
+    uint256 favoriteNumber;  
+
+    struct People {
+        uint256 favoriteNumber;
+        string name;
+    }
+
+    People[] public people;
+
+    mapping(string => uint256) public nameToFavoriteNumber;
+
+    function store(uint256 _favoriteNumber) public {
+        favoriteNumber = _favoriteNumber;
+    }
+
+    function retrieve() public view returns (uint256) {
+        return favoriteNumber;
+    }
+
+    function addPerson(string memory _name, uint256 _favoriteNumber) public {
+        people.push(People(_favoriteNumber, _name));
+        nameToFavoriteNumber[_name] = _favoriteNumber;
+    }
+}
+
+********************************************************************
+pr 4
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Storage1 {
+
+    uint256 favoriteNumber;
+    string favoriteName;
+    string favoriteColor;   // ✅ new variable
+
+    function store(uint256 _favoriteNumber, string memory _favoriteName, string memory _favoriteColor) public {
+        favoriteNumber = _favoriteNumber;
+        favoriteName = _favoriteName;
+        favoriteColor = _favoriteColor;
+    }    
+
+    function retrieveNumber() public view returns (uint256) {
+        return favoriteNumber;
+    }
+
+    function retrieveName() public view returns (string memory) {
+        return favoriteName;
+    }
+
+    function retrieveColor() public view returns (string memory) {
+        return favoriteColor;
+    }
+}
+
+
+------------------------------------
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "./Storage1.sol";
+
+contract StorageFactory {
+
+    Storage1[] public storageArray;
+
+    function createStorageContract() public {
+        Storage1 storage1 = new Storage1();
+        storageArray.push(storage1);
+    }
+
+    // ✅ Store number, name, and color
+    function sfStore(uint256 _storageIndex, uint256 _storageNumber, string memory _storageName, string memory _storageColor) public {
+        Storage1(address(storageArray[_storageIndex])).store(_storageNumber, _storageName, _storageColor);
+    }
+
+    // ✅ Get only number
+    function sfGetNumber(uint256 _storageIndex) public view returns (uint256) {
+        return Storage1(address(storageArray[_storageIndex])).retrieveNumber();
+    }
+
+    // ✅ Get only name
+    function sfGetName(uint256 _storageIndex) public view returns (string memory) {
+        return Storage1(address(storageArray[_storageIndex])).retrieveName();
+    }
+
+    // ✅ Get only color
+    function sfGetColor(uint256 _storageIndex) public view returns (string memory) {
+        return Storage1(address(storageArray[_storageIndex])).retrieveColor();
+    }
+}
+
