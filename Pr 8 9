@@ -1,0 +1,25 @@
+npm git node pip python web3
+pip install -r requirements.txt
+python.exe -m pip install --upgrade pip
+pip install -r requirements.txt    
+pip install py-solc-x
+pip install dotenv
+python deploy.py  
+
+in deploy.py change
+from web3.middleware import geth_poa_middleware
+to
+from web3.middleware.proof_of_authority import ExtraDataToPOAMiddleware
+
+this
+w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+to 
+w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+
+
+
+------------
+python 
+solidity
+prettier
+black
