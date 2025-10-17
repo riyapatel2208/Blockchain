@@ -23,3 +23,10 @@ python
 solidity
 prettier
 black
+
+
+optional 
+pip install virtualenv
+
+for metamask jova
+chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#
