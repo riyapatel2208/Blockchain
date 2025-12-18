@@ -29,7 +29,7 @@ solidity
 prettier
 black
 node npm pip black yarn pipx
-
+git
 optional 
 pip install virtualenv
 
