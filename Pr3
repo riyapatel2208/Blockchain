@@ -1,0 +1,182 @@
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.6.6 <0.9.0;
+
+contract SimpleStorage {
+
+    /* ===============================
+        STATE VARIABLES
+       =============================== */
+
+    bool public favoriteBool = true;
+    string public favoriteString = "Hello World";
+    int256 public favoriteInt = -100;
+    uint256 public favoriteNumber;
+    address public favoriteAddress =
+        0xca8F6cee18b5bc6030451f5Bda4292BaF021B606;
+
+    bytes public dynamicBytes = "dog";
+    bytes32 public fixedBytes32 = "cat";
+
+    // Used to show local variable output (Method 2)
+    uint256 public result;
+
+    /* ===============================
+        FIXED SIZE ARRAY
+       =============================== */
+
+    uint256[3] public fixedArray = [1, 2, 3];
+
+    /* ===============================
+        STRUCT
+       =============================== */
+
+    struct People {
+        uint256 favoriteNumber;
+        string name;
+        bool isActive;
+        int256 luckyNumber;
+        address wallet;
+        string nickName;
+    }
+
+    /* ===============================
+        DYNAMIC ARRAY & MAPPING
+       =============================== */
+
+    People[] public people;
+    mapping(string => uint256) public nameToFavoriteNumber;
+
+    /* ===============================
+        BASIC FUNCTIONS
+       =============================== */
+
+    function store(uint256 _favoriteNumber) public {
+        favoriteNumber = _favoriteNumber;
+    }
+
+    function retrieve() public view returns (uint256) {
+        return favoriteNumber;
+    }
+
+    function addNumbers(uint256 a, uint256 b)
+        public
+        pure
+        returns (uint256)
+    {
+        return a + b;
+    }
+
+    /* ===============================
+        PRIVATE & PUBLIC FUNCTION DEMO
+       =============================== */
+
+    // PRIVATE function: hidden logic, not visible in Remix
+    function _double(uint256 x) private pure returns (uint256) {
+        return x * 2;
+    }
+
+    // PUBLIC function: visible in Remix, calls private function
+    function calculate(uint256 x) public pure returns (uint256) {
+        return _double(x);
+    }
+
+    /* ===============================
+        ADD PERSON (METHOD 2)
+       =============================== */
+
+    function addPerson(
+        string memory _name,
+        uint256 _favoriteNumber,
+        bool _isActive,
+        int256 _luckyNumber,
+        address _wallet,
+        string memory _nickName
+    ) public {
+
+        // Local variable
+        uint256 localScopeExample = 10;
+        localScopeExample++; // becomes 11
+
+        // Assign local variable to state variable (visible output)
+        result = localScopeExample;
+
+        people.push(
+            People(
+                _favoriteNumber,
+                _name,
+                _isActive,
+                _luckyNumber,
+                _wallet,
+                _nickName
+            )
+        );
+
+        nameToFavoriteNumber[_name] = _favoriteNumber;
+    }
+
+    /* ===============================
+        VISIBILITY EXAMPLES
+       =============================== */
+
+    function externalExample() external pure returns (string memory) {
+        return "External Function";
+    }
+}
+
+
+
+---------------------output---------------------------------------------------------
+
+
+
+addPerson
+_name:riya
+_favoriteNumber:22
+_isActive:true
+_luckyNumber:7
+_wallet:0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+_nickName:riyu
+
+
+store
+_favoriteNumber:20
+
+
+addNumbers
+a:5
+b:2
+uint256: 7
+
+
+calculate
+x:12
+uint256: 24
+
+bytes: 0x646f67
+string: External Function
+address: 0xca8F6cee18b5bc6030451f5Bda4292BaF021B606
+bool: true
+int256: -100
+uint256: 20
+string: Hello World
+
+
+fixedArray:"2"
+uint256: 3
+
+bytes32: 0x6361740000000000000000000000000000000000000000000000000000000000
+
+
+nameToFavoriteNumber:riya
+uint256: 22
+people:0
+uint256: favoriteNumber 22
+string: name riya
+bool: isActive true
+int256: luckyNumber 7
+address: wallet 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
+string: nickName riyu
+
+
+uint256: 11
+uint256: 20
