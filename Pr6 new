@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.7;
+
+// Import Chainlink Aggregator Interface
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+
+contract ChainlinkPriceFeed {
+    AggregatorV3Interface internal priceFeed;
+
+    // Constructor: Set price feed address
+    constructor() {
+        // ETH / USD Price Feed (Sepolia Testnet)
+        priceFeed = AggregatorV3Interface(
+            0x694AA1769357215DE4FAC081bf1f309aDC325306
+        );
+    }
+
+    // Get latest ETH price
+    function getLatestPrice() public view returns (int256) {
+        (
+            , 
+            int256 price, 
+            , 
+            , 
+        ) = priceFeed.latestRoundData();
+
+        return price; // price has 8 decimals
+    }
+
+    // Get ETH price with decimals adjusted
+    function getPriceInUSD() public view returns (uint256) {
+        int256 price = getLatestPrice();
+        return uint256(price) / 1e8; // removes decimals
+    }
+
+    // Get price feed decimals
+    function getDecimals() public view returns (uint8) {
+        return priceFeed.decimals();
+    }
+
+    // Get price feed version
+    function getVersion() public view returns (uint256) {
+        return priceFeed.version();
+    }
+}
