@@ -1,1 +1,141 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
+/*
+    NOTE (SafeMath PSA):
+    Solidity 0.8+ has built-in overflow checks,
+    SafeMath is used here explicitly for learning & syllabus purpose.
+*/
+
+/* ============================
+    IMPORTING FROM NPM
+============================ */
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
+/* ============================
+    CONTRACT
+============================ */
+contract AdvancedFundMe7 {
+
+    using SafeMath for uint256; // using keyword + SafeMath library
+
+    /* ============================
+        ADVANCED SOLIDITY
+    ============================ */
+    mapping(address => uint256) public addressToAmountFunded; // mapping
+    address[] public funders;                                  // dynamic array
+    address public owner;                                      // contract owner
+
+    /* ============================
+        CONSTRUCTOR
+    ============================ */
+    constructor() {
+        owner = msg.sender;
+    }
+
+    /* ============================
+        FUND FUNCTION
+    ============================ */
+    function fund() public payable {
+        require(msg.value > 0, "You need to send some ETH"); // threshold + require
+
+        // SafeMath add
+        addressToAmountFunded[msg.sender] =
+            addressToAmountFunded[msg.sender].add(msg.value);
+
+        funders.push(msg.sender);
+    }
+
+    /* ============================
+        ABI + INTERFACE
+    ============================ */
+    function getPriceFeed()
+        internal
+        pure
+        returns (AggregatorV3Interface)
+    {
+        return AggregatorV3Interface(
+            0x694AA1769357215DE4FAC081bf1f309aDC325306 // Sepolia ETH/USD
+        );
+    }
+
+    /* ============================
+        GET VERSION
+    ============================ */
+    function getVersion() public view returns (uint256) {
+        return getPriceFeed().version();
+    }
+
+    /* ============================
+        GET PRICE
+    ============================ */
+    function getPrice() public view returns (uint256) {
+
+        (
+            ,               // roundId (unused)
+            int256 answer,  // ETH price
+            ,               // startedAt (unused)
+            ,               // updatedAt (unused)
+                            // answeredInRound (unused)
+        ) = getPriceFeed().latestRoundData();
+
+        // Matching units: 8 decimals → 18 decimals
+        return uint256(answer).mul(1e10);
+    }
+
+    /* ============================
+        GET CONVERSION RATE
+    ============================ */
+    function getConversionRate(uint256 ethAmount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 ethPrice = getPrice();
+
+        // SafeMath multiply + divide
+        uint256 ethAmountInUsd =
+            ethPrice.mul(ethAmount).div(1e18);
+
+        return ethAmountInUsd;
+    }
+
+    /* ============================
+        MODIFIER
+    ============================ */
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not contract owner");
+        _;
+    }
+
+    /* ============================
+        WITHDRAW FUNCTION
+    ============================ */
+    function withdraw() public onlyOwner {
+
+        // Transfer ETH
+        (bool success, ) =
+            payable(msg.sender).call{value: address(this).balance}("");
+
+        if (!success) {
+            revert("Transfer failed"); // explicit revert
+        }
+
+        // Reset mapping
+        for (uint256 i = 0; i < funders.length; i++) {
+            address funder = funders[i];
+            addressToAmountFunded[funder] = 0;
+        }
+
+        // Reset array
+        funders = new address;
+    }
+
+    /* ============================
+        BALANCE + THIS
+    ============================ */
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+}
