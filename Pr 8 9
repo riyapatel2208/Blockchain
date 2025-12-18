@@ -1,10 +1,15 @@
 npm git node pip python web3
 pip install -r requirements.txt
 python.exe -m pip install --upgrade pip
-pip install -r requirements.txt    
+pip install -r requirements.txt   
+pip install web3
+from web3 important web3
+print(web3)
 pip install py-solc-x
 pip install dotenv
 python deploy.py  
+pip install black
+
 
 in deploy.py change
 from web3.middleware import geth_poa_middleware
@@ -23,7 +28,7 @@ python
 solidity
 prettier
 black
-
+node npm pip black yarn pipx
 
 optional 
 pip install virtualenv
