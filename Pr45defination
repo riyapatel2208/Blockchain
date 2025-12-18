@@ -1,0 +1,27 @@
+Pr4
+
+Storage Factory
+
+Inheritance, Factory Pattern, and Interacting with External Contracts
+
+Factory Pattern
+
+Imports
+
+Deploy a Contract From a Contract
+
+Interact With a Deployed Contract
+
+Recap
+
+Pr5
+
+Fund Me
+
+Payable, msg.sender, msg.value, Units of Measure
+
+Payable
+
+Wei/Gwei/Eth Converter
+
+msg.sender&msg.value
