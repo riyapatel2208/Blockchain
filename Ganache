@@ -1,0 +1,7 @@
+manage network 
+show test network 
+add custom 
+network name ganache
+rpc 127.0.0.1:7545
+chain id 1337
+currency eth
