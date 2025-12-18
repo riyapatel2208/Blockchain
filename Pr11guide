@@ -1,0 +1,247 @@
+Brownie Simple Storage — Complete step-by-step guide (Windows, use `python`)
+
+This single text file contains everything to run PatrickAlphaC/brownie_simple_storage on another Windows machine where the Python binary is `python` (not `python3`).
+
+---
+
+## PREREQUISITES
+
+• Windows 10/11
+• Python 3.8+ installed and `python` available on PATH
+• Git installed (for `git clone`)
+• MetaMask extension (for testnet account)
+
+---
+
+1. OPEN A NEW POWERSHELL (or CMD) WINDOW
+
+---
+
+Always open a fresh terminal window when following these steps.
+
+2. INSTALL pipx (preferred) and Brownie
+
+---
+
+# Install pipx and ensure PATH (use `python`)
+
+python -m pip install --user pipx
+python -m pipx ensurepath
+
+# Close and re-open the terminal after `ensurepath` runs.
+
+# Install Brownie with pipx
+
+pipx install eth-brownie
+
+# If pipx installation fails, fallback to pip:
+
+python -m pip install --user eth-brownie
+
+3. CLONE THE REPO
+
+---
+
+cd %USERPROFILE%\Desktop    # or any folder you want
+git clone [https://github.com/PatrickAlphaC/brownie_simple_storage](https://github.com/PatrickAlphaC/brownie_simple_storage)
+cd brownie_simple_storage
+
+4. INSTALL solc (manual) — fixes 403 errors
+
+---
+
+python -m pip install py-solc-x
+
+# Install the exact compiler version used by the project (0.6.0)
+
+python -m solcx.install 0.6.0
+
+If installation was blocked or fails, find where solc got installed and set SOLCX_BINARY_PATH (rare). Restart the terminal afterwards.
+
+5. VERIFY COMPILATION
+
+---
+
+brownie compile
+
+Expected output snippet:
+Compiling contracts...
+Solc version: 0.6.0
+Generating build data...
+Project has been compiled. Build artifacts saved at <project>\build\contracts
+
+6. RUN TESTS
+
+---
+
+brownie test
+
+Expected: tests pass (example: "2 passed")
+
+7. RUN LOCAL DEPLOY (development network)
+
+---
+
+brownie run scripts/deploy.py
+
+This will start a temp Ganache instance, deploy, and print addresses and transaction info. The temporary chain will be terminated after the script completes.
+
+8. USE BROWNIE CONSOLE (local)
+
+---
+
+brownie console
+
+# In console (type these lines one by one):
+
+from brownie import SimpleStorage, accounts
+contract = SimpleStorage.deploy({'from': accounts[0]})    # deploy inside console
+contract.retrieve()
+contract.store(25, {'from': accounts[0]})
+contract.retrieve()
+
+Note: Deployments on the dev chain are ephemeral. A new console session creates a new chain with no prior deployments.
+
+9. PREPARE for SEPOLIA TESTNET DEPLOYMENT
+
+---
+
+A) Create a .env file in the project root (exact filename: .env)
+
+# .env contents (use a test/account with small test ETH only):
+
+PRIVATE_KEY=0xYOUR_PRIVATE_KEY_HERE
+WEB3_INFURA_PROJECT_ID=YOUR_INFURA_PROJECT_ID_HERE
+
+• Make sure the private key starts with 0x. If MetaMask copies it without 0x, prepend 0x.
+• Do NOT commit this file to git or share the key.
+
+B) Confirm brownie-config.yaml includes dotenv and wallet variables. Replace or ensure it has:
+
+compiler:
+solc:
+version: "0.6.0"
+
+dotenv: .env
+
+wallets:
+from_key: ${PRIVATE_KEY}
+
+networks:
+sepolia:
+host: [https://sepolia.infura.io/v3/${WEB3_INFURA_PROJECT_ID}](https://sepolia.infura.io/v3/${WEB3_INFURA_PROJECT_ID})
+chainid: 11155111
+
+10. EDIT scripts/deploy.py (recommended final version)
+
+---
+
+Replace contents of scripts/deploy.py with the following minimal script:
+
+from brownie import SimpleStorage, accounts, config
+
+def main():
+account = accounts.add(config["wallets"]["from_key"])
+print("Using account:", account.address)
+simple_storage = SimpleStorage.deploy({"from": account})
+print("Contract deployed at:", simple_storage.address)
+
+11. RESTART TERMINAL (Windows) — ensure .env picked up
+
+---
+
+Close PowerShell and reopen it, then `cd` into the project folder again:
+cd path\to\brownie_simple_storage
+
+Note: Brownie reads .env automatically (because we set `dotenv: .env`). Restarting helps on Windows.
+
+12. DEPLOY to SEPOLIA
+
+---
+
+# Run this command (make sure you have Sepolia test ETH):
+
+brownie run scripts/deploy.py --network sepolia
+
+Expected successful output example:
+Using account: 0x82599...dc4ef
+Transaction sent: 0xabc123...
+SimpleStorage deployed at: 0x9F1234abcd5678Ef90abcd1234567890abcd1234
+
+If you see "ValueError: private key must be exactly 32 bytes" — it means Brownie read an empty PRIVATE_KEY. Check .env location/format.
+
+13. INTERACT with the deployed contract (Sepolia)
+
+---
+
+brownie console --network sepolia
+
+# In console:
+
+from brownie import SimpleStorage, accounts, config
+acct = accounts.add(config["wallets"]["from_key"])  # your wallet
+contract = SimpleStorage[-1]
+contract.retrieve()
+tx = contract.store(42, {"from": acct})
+tx.wait(1)
+contract.retrieve()
+
+14. OPTIONAL — VERIFY on Etherscan automatically
+
+---
+
+Add your Etherscan API key to .env as ETHERSCAN_TOKEN=your_key and run with publish_source:
+
+# Update deploy.py (deploy and verify)
+
+from brownie import SimpleStorage, accounts, config
+
+def main():
+account = accounts.add(config["wallets"]["from_key"])
+simple_storage = SimpleStorage.deploy({"from": account}, publish_source=True)
+print("Deployed & verified at:", simple_storage.address)
+
+Then run:
+Brownie run scripts/deploy.py --network sepolia
+
+15. TROUBLESHOOTING CHECKLIST
+
+---
+
+• If `brownie` command not found: check pipx install and PATH, or use `python -m pip install --user eth-brownie` then restart terminal.
+• If solc 403 errors: install solc manually with solcx (`python -m solcx.install 0.6.0`).
+• If `ValueError: private key must be exactly 32 bytes`: .env not loaded or PRIVATE_KEY malformed. Ensure .env exists, no quotes, starts with 0x, and `dotenv: .env` in brownie-config.yaml.
+• If `IndexError: list index out of range` when using SimpleStorage[-1]: you are connected to a fresh local chain with no deployments — deploy in the same session first.
+• File names: ensure `.env` is not `.env.txt`. In Windows Explorer enable file extensions to check.
+
+16. EXPECTED FINAL OUTPUTS (for examiner)
+
+---
+
+• Successful compile: "Project has been compiled"
+• Successful tests: "2 passed" (or tests passed)
+• Local deploy: prints deployed address
+• Sepolia deploy: prints deployed Sepolia address and tx hash
+• Console interaction: retrieve() returns values before and after store()
+
+17. SECURITY NOTES
+
+---
+
+• Never use your main wallet’s private key for practice. Create and use a disposable wallet with small test ETH.
+• Keep .env out of source control. Add `.env` to `.gitignore`.
+
+---
+
+## SAVE THIS FILE
+
+Save this file exactly as:
+
+Run_Brownie_Simple_Storage_Windows_using_python.txt
+
+Place it inside the project root so others can run the project by following these steps verbatim.
+
+---
+
+If you want, I can now generate a ready-to-download PDF or the TXT file inside the canvas for you.
+
