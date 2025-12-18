@@ -1,0 +1,78 @@
+Using https://www.blockchain.com/show
+
+Also search specific Blocks and Transaction.
+
+step 1: Open https://www.blockchain.com/
+
+step 2: than go to Explorer menu
+
+2.1 view Blocks
+
+2.1.1 show miner
+
+2.2 view Transactions
+
+2.2.1 show transaction details
+
+step 3:Search your transaction and block
+
+
+Pr2
+
+Show eth-converter.com and explain it.
+
+Install Metamask in you browser and get Eth that.
+
+Install Ganache in windows OS.
+
+Show remix.ethereum.org and explain it.
+
+Show etherscan.io and explain it.
+
+Show andersbrownworth.com/blockchain and explain it.
+
+Pr3
+
+Basic Solidity:
+
+Versioning
+
+Compiling
+
+Contract Declaration
+
+Types & Declaring Variables
+
+uint256, int256, bool, string, address, bytes32
+
+Default Initializations
+
+Comments
+
+Functions
+
+Deploying a Contract
+
+Calling a public state-changing Function
+
+Visibility
+
+Scope
+
+View & Pure Functions
+
+Structs
+
+Intro to Storage
+
+Arrays - Dynamic & Fixed sized
+
+Compiler Errors and Warnings
+
+Memory
+
+Mappings
+
+SPDX License
+
+Recap
